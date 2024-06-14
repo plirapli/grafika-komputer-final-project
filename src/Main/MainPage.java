@@ -88,6 +88,12 @@ public class MainPage extends JFrame {
         btnColorHandler(e, Color.blue);
       }
     });
+    btnTranslate.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        btnTranslateHandler(e);
+      }
+    });
   }
 
   private void addComponents() {
@@ -237,12 +243,52 @@ public class MainPage extends JFrame {
       JOptionPane.showMessageDialog(null, "Tidak ada bangun datar.");
     }
   }
+
+  private void btnTranslateHandler(ActionEvent event) {
+    try {
+      setPanelBlank();
+      String inputX = inputTranslateX.getText();
+      String inputY = inputTranslateY.getText();
+
+      if ("".equals(inputX) || "".equals(inputY)) {
+        throw new Exception("Input masih kosong");
+      }
+
+      int tx = Integer.parseInt(inputTranslateX.getText());
+      int ty = Integer.parseInt(inputTranslateY.getText());
+
+      if (State == null) {
+        throw new Exception("Tidak ada bangun datar yang dipilih");
+      }
+
+      lx += tx;
+      ly += ty;
+      switch (State) {
+        case "Rectangle":
+          g.drawRect(lx, ly, 200, 120);
+          break;
+        case "Oval":
+          g.drawOval(lx, ly, 200, 120);
+          break;
+        case "Triangle":
+          int x[] = {lx, lx + 100, lx + 200};
+          int y[] = {ly + 120, ly, ly + 120};
+          g.drawPolygon(x, y, x.length);
+          break;
+        default:
+          break;
+      }
+
+    } catch (Exception e) {
+      JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
+    }
+  }
+
   private void btnClearHandler(ActionEvent evt) {
     panel.repaint();
     g.setColor(Color.BLACK);
     State = null;
   }
-  
 
   void setPanelBlank() {
     g.setColor(Color.WHITE); // Set the fill color to white
