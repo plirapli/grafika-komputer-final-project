@@ -12,7 +12,8 @@ public class MainPage extends JFrame {
   Graphics g;
   String State = null;
   int lx, ly;
-  int scaleX, scaleY;
+  int width = 200;
+  int height = 120;
   Color currentFillColor = null;
 
   private int rotationAngle = 0;
@@ -186,32 +187,38 @@ public class MainPage extends JFrame {
 
   private void btnRectangleHandler(ActionEvent event) {
     setPanelBlank();
+    resetSize();
     resetRotation();
     resetColor();
-    lx = panel.getWidth() / 2 - 200 / 2;
-    ly = panel.getHeight() / 2 - 120 / 2;
+
+    lx = panel.getWidth() / 2 - width / 2;
+    ly = panel.getHeight() / 2 - height / 2;
     g.drawRect(lx, ly, 200, 120);
     State = "Rectangle";
   }
 
   private void btnOvalHandler(java.awt.event.ActionEvent event) {
     setPanelBlank();
+    resetSize();
     resetRotation();
     resetColor();
-    lx = panel.getWidth() / 2 - 200 / 2;
-    ly = panel.getHeight() / 2 - 120 / 2;
+
+    lx = panel.getWidth() / 2 - width / 2;
+    ly = panel.getHeight() / 2 - height / 2;
     g.drawOval(lx, ly, 200, 120);
     State = "Oval";
   }
 
   private void btnTriangleHandler(java.awt.event.ActionEvent event) {
     setPanelBlank();
+    resetSize();
     resetRotation();
     resetColor();
-    lx = panel.getWidth() / 2 - 200 / 2;
-    ly = panel.getHeight() / 2 - 120 / 2;
-    int x[] = {lx, lx + 100, lx + 200};
-    int y[] = {ly + 120, ly, ly + 120};
+
+    lx = panel.getWidth() / 2 - width / 2;
+    ly = panel.getHeight() / 2 - height / 2;
+    int x[] = {lx, lx + width / 2, lx + width};
+    int y[] = {ly + height, ly, ly + height};
     g.drawPolygon(x, y, 3);
     State = "Triangle";
   }
@@ -240,23 +247,7 @@ public class MainPage extends JFrame {
       setPanelBlank();
       g.setColor(color);
       currentFillColor = color;
-
-      switch (State) {
-        case "Rectangle": {
-          createRectangle();
-          break;
-        }
-        case "Oval": {
-          createOval();
-          break;
-        }
-        case "Triangle": {
-          createTriangle();
-          break;
-        }
-        default:
-          break;
-      }
+      createShape();
     } else {
       JOptionPane.showMessageDialog(null, "Tidak ada bangun datar.");
     }
@@ -273,25 +264,12 @@ public class MainPage extends JFrame {
         throw new Exception("Input masih kosong");
       }
 
-      int tx = Integer.parseInt(inputTranslateX.getText());
-      int ty = Integer.parseInt(inputTranslateY.getText());
+      int tx = Integer.parseInt(inputX);
+      int ty = Integer.parseInt(inputY);
       lx += tx;
       ly += ty;
-
       setPanelBlank();
-      switch (State) {
-        case "Rectangle":
-          createRectangle();
-          break;
-        case "Oval":
-          createOval();
-          break;
-        case "Triangle":
-          createTriangle();
-          break;
-        default:
-          break;
-      }
+      createShape();
     } catch (Exception e) {
       JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
     }
@@ -310,26 +288,32 @@ public class MainPage extends JFrame {
       int angle = Integer.parseInt(inputAngle);
       rotationAngle += angle;
       setPanelBlank();
-      switch (State) {
-        case "Rectangle":
-          createRectangle();
-          break;
-        case "Oval":
-          createOval();
-          break;
-        case "Triangle":
-          createTriangle();
-          break;
-        default:
-          break;
-      }
+      createShape();
     } catch (Exception e) {
       JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
     }
   }
 
   private void btnScaleHandler(ActionEvent event) {
-    System.out.println("Tes");
+    try {
+      if (State == null) {
+        throw new Exception("Tidak ada bangun datar yang dipilih");
+      }
+      String inputX = inputScaleX.getText();
+      String inputY = inputScaleY.getText();
+      if ("".equals(inputX) || "".equals(inputY)) {
+        throw new Exception("Input masih kosong");
+      }
+
+      int scaleX = Integer.parseInt(inputX);
+      int scaleY = Integer.parseInt(inputY);
+      width += scaleX;
+      height += scaleY;
+      setPanelBlank();
+      createShape();
+    } catch (Exception e) {
+      JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
+    }
   }
 
   private void btnClearHandler(ActionEvent event) {
@@ -338,24 +322,24 @@ public class MainPage extends JFrame {
     State = null;
   }
 
-  void setPanelBlank() {
-    g.setColor(Color.WHITE); // Set the fill color to white
-    g.fillRect(0, 0, panel.getWidth(), panel.getHeight()); // Clear the canvas
-    g.setColor(Color.BLACK); // Set outline color to black
-  }
-
-  void resetRotation() {
-    rotationAngle = 0;
-  }
-
-  void resetColor() {
-    currentFillColor = null;
+  void createShape() {
+    switch (State) {
+      case "Rectangle":
+        createRectangle();
+        break;
+      case "Oval":
+        createOval();
+        break;
+      case "Triangle":
+        createTriangle();
+        break;
+      default:
+        break;
+    }
   }
 
   void createRectangle() {
     Graphics2D graphics2D = (Graphics2D) g.create();
-    int width = 200;
-    int height = 120;
 
     // Menghitung titik pusat
     int centroidX = lx + (width / 2);
@@ -373,8 +357,6 @@ public class MainPage extends JFrame {
 
   void createOval() {
     Graphics2D graphics2D = (Graphics2D) g.create();
-    int width = 200;
-    int height = 120;
 
     // Menghitung titik pusat
     int centroidX = lx + (width / 2);
@@ -392,8 +374,8 @@ public class MainPage extends JFrame {
 
   void createTriangle() {
     Graphics2D graphics2D = (Graphics2D) g.create();
-    int x[] = {lx, lx + 100, lx + 200};
-    int y[] = {ly + 120, ly, ly + 120};
+    int x[] = {lx, lx + width / 2, lx + width};
+    int y[] = {ly + height, ly, ly + height};
 
     // Calculate the centroid of the triangle
     int centroidX = (x[0] + x[1] + x[2]) / 3;
@@ -404,14 +386,43 @@ public class MainPage extends JFrame {
     if (currentFillColor == null) {
       graphics2D.drawPolygon(x, y, 3);
     } else {
+      graphics2D.setColor(currentFillColor);
       graphics2D.fillPolygon(x, y, 3);
     }
   }
 
-  private JPanel panel = new JPanel();
-  private JButton btnClear = new JButton("Clear"), btnTranslate = new JButton("Translate"), btnRotate = new JButton("Rotate"), btnScale = new JButton("Scale");
-  private JButton btnPentagon = new JButton("Pentagon"), btnRectangle = new JButton("Rectangle"), btnOval = new JButton("Oval"), btnTriangle = new JButton("Triangle"), btnHexagon = new JButton("Hexagon");
-  private JButton btnRed = new JButton("Red"), btnGreen = new JButton("Green"), btnBlue = new JButton("Blue");
+  void setPanelBlank() {
+    g.setColor(Color.WHITE); // Set the fill color to white
+    g.fillRect(0, 0, panel.getWidth(), panel.getHeight()); // Clear the canvas
+    g.setColor(Color.BLACK); // Set outline color to black
+  }
+
+  void resetRotation() {
+    rotationAngle = 0;
+  }
+
+  void resetColor() {
+    currentFillColor = null;
+  }
+
+  void resetSize() {
+    width = 200;
+    height = 120;
+  }
+
+  private final JPanel panel = new JPanel();
+  private final JButton btnClear = new JButton("Clear");
+  private final JButton btnTranslate = new JButton("Translate");
+  private final JButton btnRotate = new JButton("Rotate");
+  private final JButton btnScale = new JButton("Scale");
+  private final JButton btnPentagon = new JButton("Pentagon");
+  private final JButton btnRectangle = new JButton("Rectangle");
+  private final JButton btnOval = new JButton("Oval");
+  private final JButton btnTriangle = new JButton("Triangle");
+  private final JButton btnHexagon = new JButton("Hexagon");
+  private final JButton btnRed = new JButton("Red");
+  private final JButton btnGreen = new JButton("Green");
+  private final JButton btnBlue = new JButton("Blue");
 
   private final JTextField inputTranslateX = new JTextField();
   private final JTextField inputTranslateY = new JTextField();
