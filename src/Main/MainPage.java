@@ -9,13 +9,10 @@ import javax.swing.*;
 
 public class MainPage extends JFrame {
 
-  Graphics g;
-  String State = null;
-  int lx, ly;
-  int width = 200;
-  int height = 120;
-  Color currentFillColor = null;
-
+  private Graphics g;
+  private String State = null;
+  private int lx, ly, width, height;
+  private Color currentFillColor = null;
   private int rotationAngle = 0;
 
   MainPage() {
@@ -36,12 +33,7 @@ public class MainPage extends JFrame {
     setLayout(null);
     setLocationRelativeTo(null);
 
-    btnClear.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        btnClearHandler(e);
-      }
-    });
+    // Shape
     btnRectangle.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -72,6 +64,8 @@ public class MainPage extends JFrame {
         btnHexagonHandler(e);
       }
     });
+
+    // Color
     btnRed.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -90,6 +84,8 @@ public class MainPage extends JFrame {
         btnColorHandler(e, Color.blue);
       }
     });
+
+    // Manipulation
     btnTranslate.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -108,6 +104,12 @@ public class MainPage extends JFrame {
         btnRotateHandler(e);
       }
     });
+    btnClear.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        btnClearHandler(e);
+      }
+    });
   }
 
   private void addComponents() {
@@ -121,8 +123,8 @@ public class MainPage extends JFrame {
     add(btnRectangle);
     add(btnOval);
     add(btnTriangle);
-//    add(btnPentagon);
-//    add(btnHexagon);
+    add(btnPentagon);
+    add(btnHexagon);
 
     add(btnRed);
     add(btnGreen);
@@ -186,65 +188,56 @@ public class MainPage extends JFrame {
   }
 
   private void btnRectangleHandler(ActionEvent event) {
-    setPanelBlank();
+    resetCanvas();
+    resetCoordinate();
     resetSize();
     resetRotation();
     resetColor();
-
-    lx = panel.getWidth() / 2 - width / 2;
-    ly = panel.getHeight() / 2 - height / 2;
-    g.drawRect(lx, ly, 200, 120);
+    createRectangle();
     State = "Rectangle";
   }
 
   private void btnOvalHandler(java.awt.event.ActionEvent event) {
-    setPanelBlank();
+    resetCanvas();
+    resetCoordinate();
     resetSize();
     resetRotation();
     resetColor();
-
-    lx = panel.getWidth() / 2 - width / 2;
-    ly = panel.getHeight() / 2 - height / 2;
-    g.drawOval(lx, ly, 200, 120);
+    createOval();
     State = "Oval";
   }
 
   private void btnTriangleHandler(java.awt.event.ActionEvent event) {
-    setPanelBlank();
+    resetCanvas();
+    resetCoordinate();
     resetSize();
     resetRotation();
     resetColor();
-
-    lx = panel.getWidth() / 2 - width / 2;
-    ly = panel.getHeight() / 2 - height / 2;
-    int x[] = {lx, lx + width / 2, lx + width};
-    int y[] = {ly + height, ly, ly + height};
-    g.drawPolygon(x, y, 3);
+    createTriangle();
     State = "Triangle";
   }
 
   private void btnPentagonHandler(ActionEvent event) {
-    setPanelBlank();
-    lx = panel.getWidth() / 2 - 200 / 2;
-    ly = panel.getHeight() / 2 - 120 / 2;
-    System.out.println(ly);
-    int x[] = {lx, lx + 100, lx + 200, lx + 300, lx + 400};
-    int y[] = {ly + 120, ly, ly + 120, ly, ly + 120};
-    g.drawPolygon(x, y, 5);
+    resetCanvas();
+    resetCoordinate();
+    resetSize();
+    resetRotation();
+    resetColor();
+    createPentagon();
     State = "Pentagon";
   }
 
   private void btnHexagonHandler(java.awt.event.ActionEvent event) {
-    setPanelBlank();
-    lx = panel.getWidth() / 2 - 120 / 2;
-    ly = panel.getHeight() / 2 - 120 / 2;
-    g.drawRect(lx, ly, 120, 120);
-    State = "Hexagon";
+//    resetCanvas();
+//    lx = panel.getWidth() / 2 - 120 / 2;
+//    ly = panel.getHeight() / 2 - 120 / 2;
+//    g.drawRect(lx, ly, 120, 120);
+//    State = "Hexagon";
   }
 
   private void btnColorHandler(ActionEvent event, Color color) {
     if (State != null) {
-      setPanelBlank();
+      resetCanvas();
       g.setColor(color);
       currentFillColor = color;
       createShape();
@@ -268,7 +261,7 @@ public class MainPage extends JFrame {
       int ty = Integer.parseInt(inputY);
       lx += tx;
       ly += ty;
-      setPanelBlank();
+      resetCanvas();
       createShape();
     } catch (Exception e) {
       JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
@@ -287,7 +280,7 @@ public class MainPage extends JFrame {
 
       int angle = Integer.parseInt(inputAngle);
       rotationAngle += angle;
-      setPanelBlank();
+      resetCanvas();
       createShape();
     } catch (Exception e) {
       JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
@@ -309,7 +302,7 @@ public class MainPage extends JFrame {
       int scaleY = Integer.parseInt(inputY);
       width += scaleX;
       height += scaleY;
-      setPanelBlank();
+      resetCanvas();
       createShape();
     } catch (Exception e) {
       JOptionPane.showMessageDialog(null, e.getLocalizedMessage());
@@ -333,6 +326,8 @@ public class MainPage extends JFrame {
       case "Triangle":
         createTriangle();
         break;
+      case "Pentagon":
+        createPentagon();
       default:
         break;
     }
@@ -380,18 +375,73 @@ public class MainPage extends JFrame {
     // Calculate the centroid of the triangle
     int centroidX = (x[0] + x[1] + x[2]) / 3;
     int centroidY = (y[0] + y[1] + y[2]) / 3;
+    System.out.println(centroidX + ", " + centroidY);
 
     // Rotate around the centroid
     graphics2D.rotate(Math.toRadians(rotationAngle), centroidX, centroidY);
     if (currentFillColor == null) {
-      graphics2D.drawPolygon(x, y, 3);
+      graphics2D.drawPolygon(x, y, x.length);
     } else {
       graphics2D.setColor(currentFillColor);
-      graphics2D.fillPolygon(x, y, 3);
+      graphics2D.fillPolygon(x, y, x.length);
     }
   }
 
-  void setPanelBlank() {
+  void createPentagon() {
+    Graphics2D graphics2D = (Graphics2D) g.create();
+
+    /*
+    Set the coordinate
+            5
+    1              4
+         2   3
+     */
+    int yTengah = ly + (height / 2) - (height / 8);
+    int x[] = {lx, lx + (width / 8), lx + width - (width / 8), lx + width, lx + (width / 2)};
+    int y[] = {yTengah, ly + height, ly + height, yTengah, ly};
+
+    // Calculate the centroid of the triangle
+    int centroidX = (x[0] + x[1] + x[2] + x[3] + x[4]) / 5;
+    int centroidY = (y[0] + y[1] + y[2] + y[3] + y[4]) / 5;
+
+    // Rotate around the centroid
+    graphics2D.rotate(Math.toRadians(rotationAngle), centroidX, centroidY);
+    if (currentFillColor == null) {
+      graphics2D.drawPolygon(x, y, x.length);
+    } else {
+      graphics2D.setColor(currentFillColor);
+      graphics2D.fillPolygon(x, y, x.length);
+    }
+  }
+
+  void createHexagon() {
+    Graphics2D graphics2D = (Graphics2D) g.create();
+
+    /*
+    Set the coordinate
+            5
+    1              4
+         2   3
+     */
+    int yTengah = ly + (height / 2) - (height / 8);
+    int x[] = {lx, lx + (width / 8), lx + width - (width / 8), lx + width, lx + (width / 2)};
+    int y[] = {yTengah, ly + height, ly + height, yTengah, ly};
+
+    // Calculate the centroid of the triangle
+    int centroidX = (x[0] + x[1] + x[2] + x[3] + x[4]) / 5;
+    int centroidY = (y[0] + y[1] + y[2] + y[3] + y[4]) / 5;
+
+    // Rotate around the centroid
+    graphics2D.rotate(Math.toRadians(rotationAngle), centroidX, centroidY);
+    if (currentFillColor == null) {
+      graphics2D.drawPolygon(x, y, x.length);
+    } else {
+      graphics2D.setColor(currentFillColor);
+      graphics2D.fillPolygon(x, y, x.length);
+    }
+  }
+
+  void resetCanvas() {
     g.setColor(Color.WHITE); // Set the fill color to white
     g.fillRect(0, 0, panel.getWidth(), panel.getHeight()); // Clear the canvas
     g.setColor(Color.BLACK); // Set outline color to black
@@ -406,8 +456,13 @@ public class MainPage extends JFrame {
   }
 
   void resetSize() {
-    width = 200;
-    height = 120;
+    width = 144;
+    height = 144;
+  }
+
+  void resetCoordinate() {
+    lx = panel.getWidth() / 2 - 200 / 2;
+    ly = panel.getHeight() / 2 - 120 / 2;
   }
 
   private final JPanel panel = new JPanel();
