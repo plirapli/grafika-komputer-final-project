@@ -189,50 +189,37 @@ public class MainPage extends JFrame {
 
   private void btnRectangleHandler(ActionEvent event) {
     resetCanvas();
-    resetCoordinate();
-    resetSize();
-    resetRotation();
-    resetColor();
+    resetAll();
     createRectangle();
     State = "Rectangle";
   }
 
   private void btnOvalHandler(java.awt.event.ActionEvent event) {
     resetCanvas();
-    resetCoordinate();
-    resetSize();
-    resetRotation();
-    resetColor();
+    resetAll();
     createOval();
     State = "Oval";
   }
 
   private void btnTriangleHandler(java.awt.event.ActionEvent event) {
     resetCanvas();
-    resetCoordinate();
-    resetSize();
-    resetRotation();
-    resetColor();
+    resetAll();
     createTriangle();
     State = "Triangle";
   }
 
   private void btnPentagonHandler(ActionEvent event) {
     resetCanvas();
-    resetCoordinate();
-    resetSize();
-    resetRotation();
-    resetColor();
+    resetAll();
     createPentagon();
     State = "Pentagon";
   }
 
   private void btnHexagonHandler(java.awt.event.ActionEvent event) {
-//    resetCanvas();
-//    lx = panel.getWidth() / 2 - 120 / 2;
-//    ly = panel.getHeight() / 2 - 120 / 2;
-//    g.drawRect(lx, ly, 120, 120);
-//    State = "Hexagon";
+    resetCanvas();
+    resetAll();
+    createHexagon();
+    State = "Hexagon";
   }
 
   private void btnColorHandler(ActionEvent event, Color color) {
@@ -328,6 +315,10 @@ public class MainPage extends JFrame {
         break;
       case "Pentagon":
         createPentagon();
+        break;
+      case "Hexagon":
+        createHexagon();
+        break;
       default:
         break;
     }
@@ -391,10 +382,12 @@ public class MainPage extends JFrame {
     Graphics2D graphics2D = (Graphics2D) g.create();
 
     /*
-    Set the coordinate
+    Set the coordinate:
+    
             5
-    1              4
+    1             4
          2   3
+    
      */
     int yTengah = ly + (height / 2) - (height / 8);
     int x[] = {lx, lx + (width / 8), lx + width - (width / 8), lx + width, lx + (width / 2)};
@@ -418,18 +411,22 @@ public class MainPage extends JFrame {
     Graphics2D graphics2D = (Graphics2D) g.create();
 
     /*
-    Set the coordinate
-            5
-    1              4
+    Set the coordinate:
+    
+         6   5
+    1             4
          2   3
+    
      */
-    int yTengah = ly + (height / 2) - (height / 8);
-    int x[] = {lx, lx + (width / 8), lx + width - (width / 8), lx + width, lx + (width / 2)};
-    int y[] = {yTengah, ly + height, ly + height, yTengah, ly};
+    int yTengah = ly + height / 2;
+    int xTengah1 = lx + (width / 4);
+    int xTengah2 = lx + width - (width / 4);
+    int x[] = {lx, xTengah1, xTengah2, lx + width, xTengah2, xTengah1};
+    int y[] = {yTengah, ly + height, ly + height, yTengah, ly, ly};
 
     // Calculate the centroid of the triangle
-    int centroidX = (x[0] + x[1] + x[2] + x[3] + x[4]) / 5;
-    int centroidY = (y[0] + y[1] + y[2] + y[3] + y[4]) / 5;
+    int centroidX = (x[0] + x[1] + x[2] + x[3] + x[4] + x[5]) / 6;
+    int centroidY = (y[0] + y[1] + y[2] + y[3] + y[4] + x[5]) / 6;
 
     // Rotate around the centroid
     graphics2D.rotate(Math.toRadians(rotationAngle), centroidX, centroidY);
@@ -446,23 +443,26 @@ public class MainPage extends JFrame {
     g.fillRect(0, 0, panel.getWidth(), panel.getHeight()); // Clear the canvas
     g.setColor(Color.BLACK); // Set outline color to black
   }
-
-  void resetRotation() {
-    rotationAngle = 0;
+  void resetAll() {
+    resetColor();
+    resetCoordinate();
+    resetRotation();
+    resetRotation();
+    resetSize();
   }
-
   void resetColor() {
     currentFillColor = null;
   }
-
-  void resetSize() {
-    width = 144;
-    height = 144;
-  }
-
   void resetCoordinate() {
     lx = panel.getWidth() / 2 - 200 / 2;
     ly = panel.getHeight() / 2 - 120 / 2;
+  }
+  void resetRotation() {
+    rotationAngle = 0;
+  }
+  void resetSize() {
+    width = 144;
+    height = 144;
   }
 
   private final JPanel panel = new JPanel();
